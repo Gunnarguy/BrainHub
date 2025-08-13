@@ -1,0 +1,24 @@
+{
+  "hub_key": "papers",
+  "title": "Medical Papers Hub",
+  "manifest_version": 1,
+  "tables": [
+    {"name": "paper_metadata", "cols": [["id","text pk"],["doi","text"],["title","text"],["year","int"],["journal","text"],["authors_json","json"],["abstract","text"]]},
+    {"name": "paper_citation", "cols": [["edge_id","text pk"],["citing_id","text"],["cited_id","text"]]}
+  ],
+  "views": [
+    {"name": "v_paper_index", "sql": "SELECT id, doi, title, year, journal, json_array_length(authors_json) AS author_count FROM paper_metadata"}
+  ],
+  "retrieval": {
+    "alpha": 0.62,
+    "stoplist": ["the","a","and","of"],
+    "synonyms": {"rct": ["randomized controlled trial"], "ae": ["adverse event"]}
+  },
+  "ui": {"default_views": ["Search","Graph","Table"]},
+  "automations": [
+    {"trigger": "on_ingest", "actions": [
+      {"type": "summarize", "budget_tokens": 400, "target": "abstract"},
+      {"type": "tag_entities", "model": "ner-medical"}
+    ]}
+  ]
+}

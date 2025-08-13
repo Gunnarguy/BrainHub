@@ -1,0 +1,23 @@
+{
+  "hub_key": "health",
+  "title": "Health Data Hub",
+  "manifest_version": 1,
+  "tables": [
+    {"name": "health_metric", "cols": [["id","text pk"],["date","text"],["metric_type","text"],["value","real"],["unit","text"],["source","text"]]},
+    {"name": "health_session", "cols": [["id","text pk"],["start_ts","text"],["end_ts","text"],["kind","text"],["meta_json","json"]]}
+  ],
+  "views": [
+    {"name": "v_daily_health", "sql": "SELECT date, metric_type, AVG(value) AS avg_value, unit FROM health_metric GROUP BY date, metric_type, unit"}
+  ],
+  "retrieval": {
+    "alpha": 0.6,
+    "stoplist": ["the","a","and"],
+    "synonyms": {"hrv": ["heart rate variability"], "bp": ["blood pressure"]}
+  },
+  "ui": {"default_views": ["Search","Timeline","Table"]},
+  "automations": [
+    {"trigger": "on_ingest", "actions": [
+      {"type": "summarize", "budget_tokens": 300, "target": "daily"}
+    ]}
+  ]
+}

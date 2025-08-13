@@ -1,0 +1,24 @@
+{
+  "hub_key": "api_docs",
+  "title": "API Documentation Hub",
+  "manifest_version": 1,
+  "tables": [
+    {"name": "api_endpoint", "cols": [["id","text pk"],["service","text"],["version","text"],["method","text"],["path","text"],["description","text"],["params_json","json"],["auth_scope","text"]]},
+    {"name": "api_change_log", "cols": [["id","text pk"],["endpoint_id","text"],["changed_at","text"],["change_type","text"],["notes","text"]]}
+  ],
+  "views": [
+    {"name": "v_api_surface", "sql": "SELECT id, service, version, method, path, auth_scope FROM api_endpoint"}
+  ],
+  "retrieval": {
+    "alpha": 0.58,
+    "stoplist": ["the","a","and","for"],
+    "synonyms": {"oauth": ["o auth"], "authn": ["authentication"], "authz": ["authorization"]}
+  },
+  "ui": {"default_views": ["Search","Table","Card"]},
+  "automations": [
+    {"trigger": "on_ingest", "actions": [
+      {"type": "summarize", "budget_tokens": 250, "target": "endpoint"},
+      {"type": "tag_entities", "model": "ner-tech"}
+    ]}
+  ]
+}
