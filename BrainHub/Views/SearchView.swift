@@ -108,13 +108,27 @@ extension SearchView {
         if lastIndex < lowerText.endIndex {
             segments.append((String(text[lastIndex..<lowerText.endIndex]), false))
         }
-        // Assemble Text
-        var result = Text("")
-        for (seg, highlight) in segments {
-            if highlight { result = result + Text(seg).bold().foregroundColor(.accentColor) }
-            else { result = result + Text(seg) }
+        // Assemble an AttributedString so we can style matched ranges without using '+' on Text
+        let mutable = NSMutableAttributedString(string: text)
+        let nsText = text as NSString
+        var searchRange = NSRange(location: 0, length: nsText.length)
+        let searchTerm = trimmed
+        while true {
+            let found = nsText.range(of: searchTerm, options: .caseInsensitive, range: searchRange)
+            if found.location == NSNotFound { break }
+            // Apply bold font and accent color to the found range
+            let boldFont = UIFont.boldSystemFont(ofSize: UIFont.systemFontSize)
+            mutable.addAttribute(.font, value: boldFont, range: found)
+            // Try to use the SwiftUI accent color as a UIColor; fall back to systemBlue if conversion fails
+            let accentUIColor = UIColor(Color.accentColor)
+            mutable.addAttribute(.foregroundColor, value: accentUIColor, range: found)
+            // Move search range past the found occurrence
+            let nextLocation = found.location + found.length
+            searchRange = NSRange(location: nextLocation, length: nsText.length - nextLocation)
         }
-        return result
+    // Convert to AttributedString and return as Text
+    let attributed = AttributedString(mutable)
+    return Text(attributed)
     }
 }
 
