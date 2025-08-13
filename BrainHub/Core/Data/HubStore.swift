@@ -26,12 +26,36 @@ final class HubStore: ObservableObject {
     @Published private(set) var descriptors: [HubDescriptor] = []
     @Published private(set) var pinned: Set<String> = []
     @Published private(set) var recent: [String] = []  // MRU order
+    @Published var lastUsedIngestHub: String? = nil
+    @Published var lastUsedSearchHub: String? = nil
 
     private var manifestCache: [String: HubManifest] = [:]
     private let manifestLoader: ManifestLoader
     private let maxRecent = 12
+    private let defaults = UserDefaults.standard
+    private let pinnedKey = "brainhub.pinned"
+    private let recentKey = "brainhub.recent"
+    private let lastIngestKey = "brainhub.last.ingest"
+    private let lastSearchKey = "brainhub.last.search"
 
-    init(manifestLoader: ManifestLoader) { self.manifestLoader = manifestLoader }
+    init(manifestLoader: ManifestLoader) {
+        self.manifestLoader = manifestLoader
+        loadPersisted()
+    }
+
+    private func loadPersisted() {
+        if let arr = defaults.array(forKey: pinnedKey) as? [String] { pinned = Set(arr) }
+        if let arr = defaults.array(forKey: recentKey) as? [String] { recent = arr }
+        lastUsedIngestHub = defaults.string(forKey: lastIngestKey)
+        lastUsedSearchHub = defaults.string(forKey: lastSearchKey)
+    }
+
+    private func persist() {
+        defaults.set(Array(pinned), forKey: pinnedKey)
+        defaults.set(recent, forKey: recentKey)
+        if let l = lastUsedIngestHub { defaults.set(l, forKey: lastIngestKey) }
+        if let l = lastUsedSearchHub { defaults.set(l, forKey: lastSearchKey) }
+    }
 
     /// Register a list of hubs (lightweight meta) without loading full manifest bodies yet.
     func register(_ list: [HubDescriptor]) {
@@ -64,9 +88,9 @@ final class HubStore: ObservableObject {
         }
     }
 
-    func pin(_ hubKey: String) { pinned.insert(hubKey) }
-    func unpin(_ hubKey: String) { pinned.remove(hubKey) }
-    func togglePin(_ hubKey: String) { if pinned.contains(hubKey) { pinned.remove(hubKey) } else { pinned.insert(hubKey) } }
+    func pin(_ hubKey: String) { pinned.insert(hubKey); persist() }
+    func unpin(_ hubKey: String) { pinned.remove(hubKey); persist() }
+    func togglePin(_ hubKey: String) { if pinned.contains(hubKey) { pinned.remove(hubKey) } else { pinned.insert(hubKey) }; persist() }
 
     /// Ordered list: pinned first (descriptor order), then recents (excluding pinned), then remaining.
     func orderedForPicker() -> [HubDescriptor] {
@@ -83,5 +107,6 @@ final class HubStore: ObservableObject {
         recent.removeAll { $0 == hubKey }
         recent.insert(hubKey, at: 0)
         if recent.count > maxRecent { recent.removeLast() }
+    persist()
     }
 }
