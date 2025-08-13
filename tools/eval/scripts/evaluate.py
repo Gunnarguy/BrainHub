@@ -2,7 +2,7 @@
 """Minimal evaluation script skeleton for BrainHub retrieval.
 
 Usage:
-  python evaluate.py --gold eval/gold/*.jsonl --run run.jsonl --k 10
+  python evaluate.py --gold tools/eval/gold/*.jsonl --run run.jsonl --k 10
 
 Generates a JSON summary to stdout.
 
@@ -87,6 +87,7 @@ def main():
     }
     json.dump(summary, sys.stdout, indent=2)
     print()
+
 
 if __name__ == '__main__':
     main()

@@ -5,7 +5,7 @@ This folder will hold the golden query sets and scripts to compute retrieval met
 ## Structure
 
 ```
-/eval
+/tools/eval
   README.md
   gold/
     health_seed.jsonl
@@ -23,7 +23,7 @@ This folder will hold the golden query sets and scripts to compute retrieval met
 ## Workflow (Early Stage)
 
 1. Populate seed gold files (≈10 queries each hub) with positive chunk IDs (once chunks exist).
-2. Run `evaluate.py --gold gold/*.jsonl --results run.jsonl` after producing a retrieval run file.
+2. Run `evaluate.py --gold tools/eval/gold/*.jsonl --results run.jsonl` after producing a retrieval run file.
 3. Inspect JSON summary; update baseline if metrics improved without regressions elsewhere.
 
 ## Gold JSONL Record Format (Proposed)
