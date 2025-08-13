@@ -61,6 +61,17 @@ final class DatabaseManager {
     func query(_ sql: String, bind: ((OpaquePointer?) -> Void)? = nil, map: (OpaquePointer?) -> Void) throws {
         try openIfNeeded()
         var stmt: OpaquePointer? = nil
+    // Bind closure contract:
+    // - The `bind` closure receives the prepared `sqlite3_stmt` pointer (as OpaquePointer?).
+    // - Use `sqlite3_bind_*` in the same ordinal order as `?` placeholders in `sql`.
+    // - Use `SQLITE_TRANSIENT` (or equivalent) when binding Swift-managed strings/data.
+    // - The closure should not call `sqlite3_step` or `sqlite3_reset` — the caller will step the statement.
+    // Example:
+    // try db.query("SELECT id FROM document WHERE hub_id=? AND title=?", bind: { stmt in
+    //     sqlite3_bind_text(stmt, 1, hubId, -1, SQLITE_TRANSIENT)
+    //     sqlite3_bind_text(stmt, 2, title, -1, SQLITE_TRANSIENT)
+    // }, map: { stmt in ... })
+
         if sqlite3_prepare_v2(db, sql, -1, &stmt, nil) != SQLITE_OK { throw error("Prepare failed") }
         defer { sqlite3_finalize(stmt) }
         bind?(stmt)

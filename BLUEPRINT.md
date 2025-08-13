@@ -1,6 +1,6 @@
 # BrainHub Beta Blueprint (Live Document)
 
-> **Last Updated: August 12, 2025**
+> **Last Updated: August 13, 2025**
 > This document is the architectural north star and reflects the current state of the prototype. It evolves as the implementation progresses.
 
 ## 0. Current Implementation Status
@@ -156,8 +156,10 @@ The `ManifestModels.swift` and `ManifestLoader.swift` files define the structure
 
 ## 21. Immediate Next Steps (Revised)
 
-1.  **Implement Parameterized Queries**:
-    - **Task**: Enhance `DatabaseManager` to support `sqlite3_bind_*` functions to prevent SQL injection vulnerabilities. This is the highest priority technical debt.
+1.  **Parameterized Queries (implemented)**:
+
+- **Status**: Implemented. `DatabaseManager` exposes a `query(_:bind:map:)` helper and callers use `sqlite3_bind_*` to safely bind parameters.
+
 2.  **Implement Embedding Stub**:
     - **Task**: Create an `EmbeddingService` protocol and a stub that generates deterministic, pseudo-random vectors.
     - **Why**: This allows the entire hybrid search pipeline to be built and tested without a dependency on a live model API.

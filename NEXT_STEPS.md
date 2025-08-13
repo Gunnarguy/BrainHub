@@ -1,6 +1,6 @@
 # BrainHub – Quick Resume & Next Steps
 
-> **Last Updated: August 12, 2025**
+> **Last Updated: August 13, 2025**
 > This document provides a snapshot of the current project state and a clear, actionable plan for what to do next.
 
 ## Current State: Foundational Ingestion Pipeline Complete & Refined
@@ -31,8 +31,8 @@ The next phase focuses on building out the "hybrid" part of the retrieval system
 
 1.  **Implement Parameterized Queries**:
 
-    - **Task**: Enhance `DatabaseManager` to support `sqlite3_bind_*` functions.
-    - **Why**: To eliminate SQL injection risks from string interpolation and improve query performance and reliability. This is the highest priority technical debt.
+- **Status**: Implemented. `DatabaseManager` provides a prepared-statement helper `query(_:bind:map:)` and code paths in `SearchService` demonstrate safe `sqlite3_bind_*` usage.
+- **Why**: This reduces SQL injection risk and improves robustness; remaining work is broader use coverage and tests.
 
 2.  **Introduce a Stubbed Embedding Service**:
 

@@ -3,6 +3,9 @@
 //  Orchestrates file parsing, deduplication, chunking, and storage.
 
 import Foundation
+import SQLite3
+
+private let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
 final class IngestCoordinator {
     private let parser = ParserRegistry()
@@ -46,8 +49,11 @@ final class IngestCoordinator {
             targetChars: targetChunkChars
         )
 
-        // Update hash on the newly inserted document.
-        try DatabaseManager.shared.exec("UPDATE document SET hash='\(hashHex)' WHERE id='\(ingestResult.docId)'")
+        // Update hash on the newly inserted document using a parameterized query.
+        try DatabaseManager.shared.query("UPDATE document SET hash=? WHERE id=?", bind: { stmt in
+            sqlite3_bind_text(stmt, 1, hashHex, -1, SQLITE_TRANSIENT)
+            sqlite3_bind_text(stmt, 2, ingestResult.docId, -1, SQLITE_TRANSIENT)
+        }, map: { _ in })
 
         return Result(documentId: ingestResult.docId, title: parsed.title, chunkCount: ingestResult.chunkCount, deduped: false)
     }
@@ -55,7 +61,8 @@ final class IngestCoordinator {
     private func existingDocumentExists(hubKey: String, hashHex: String) throws -> Bool {
         var found = false
         try DatabaseManager.shared.query("SELECT 1 FROM document WHERE hub_id=? AND hash=? LIMIT 1", bind: { stmt in
-            // Manual bind due to earlier simple wrapper (future: adopt param API) – skipping for brevity.
+            sqlite3_bind_text(stmt, 1, hubKey, -1, SQLITE_TRANSIENT)
+            sqlite3_bind_text(stmt, 2, hashHex, -1, SQLITE_TRANSIENT)
         }, map: { _ in found = true })
         return found
     }

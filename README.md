@@ -4,7 +4,7 @@ BrainHub is an offline-first iOS app where you create **Hubs** for any topic (He
 
 This repository contains the prototype SwiftUI application and its foundational components.
 
-## Current Status (As of August 12, 2025)
+## Current Status (As of August 13, 2025)
 
 The project is in an early but functional state. The foundational pieces are in place, allowing a user to:
 
@@ -18,12 +18,16 @@ The project is in an early but functional state. The foundational pieces are in 
 ### Core Architectural Components Implemented:
 
 - **Database Substrate**: A robust set of SQLite tables for workspaces, hubs, documents, and chunks, managed by `DatabaseManager`.
+  - **Safety**: `DatabaseManager` exposes a prepared-statement helper and callers bind parameters with `sqlite3_bind_*` to prevent injection.
 - **JSON Manifests**: Hub configurations are loaded from `.json` files located in the `BrainHub/Resources` directory.
 - **Scalable Hub Management**: The `HubStore` manages a potentially large number of hubs, with a UI designed for searching and pinning, avoiding cluttered interfaces.
 - **Extensible Ingestion Pipeline**:
   - `ParserRegistry`: A modular system that can parse various file types (currently plain text, Markdown, PDF). It's designed to be easily extended with new parsers (e.g., for `.docx`, `.html`).
   - `IngestCoordinator`: Orchestrates the process of parsing, content hashing for deduplication, and chunking.
 - **UI**: A basic but functional SwiftUI interface demonstrating ingestion (manual and file-based) and search.
+
+- **Observability**: An in-memory `EventLogger` and `EventsView` capture recent app events for quick diagnostics.
+- **Keyboard UX**: Keyboard is now dismissed automatically on tapping or dragging outside text fields; explicit "Hide" buttons were removed.
 
 ---
 

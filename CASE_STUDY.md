@@ -1,6 +1,6 @@
 # BrainHub Case Study & Project Plan
 
-> **Last Updated: August 12, 2025**
+> **Last Updated: August 13, 2025**
 > This document outlines the project's goals, current status, and the plan for moving forward. It serves as a reference for both the case study evaluation and the development roadmap.
 
 ## 1. Project Vision & Success Metrics
@@ -30,6 +30,8 @@ The project has a solid architectural foundation. The focus has been on creating
 - **Scalable Hub Management**: The `HubStore` and a dedicated hub picker UI allow the application to manage a large number of hubs without performance degradation or a cluttered interface. Users can search, pin, and quickly access their most-used hubs.
 - **Lexical Search**: A fast, FTS5-based search is fully operational. It supports both global and hub-scoped queries.
 - **Data Model**: The SQLite database schema is well-defined, with tables for documents, chunks, and hubs, and includes appropriate indexes for efficient querying.
+- **Event Logging & Diagnostics**: A lightweight `EventLogger` records structured events (ring buffer) and an `EventsView` lets you inspect recent activity.
+- **Safety**: `DatabaseManager` provides a prepared-statement helper; core callers use `sqlite3_bind_*` bindings to avoid SQL injection risks.
 
 ### Architectural Diagram (Current):
 
